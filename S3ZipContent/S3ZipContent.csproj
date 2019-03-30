@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Hakan Kutluay</Authors>
+    <Description>Lists zip file content on AWS S3 without downloading whole document. Supports both zip and zip64 files.</Description>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageTags>zip file content on aws s3</PackageTags>
+    <Version>1.0.1</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.S3" Version="3.3.0" />
+  </ItemGroup>
+
+</Project>
