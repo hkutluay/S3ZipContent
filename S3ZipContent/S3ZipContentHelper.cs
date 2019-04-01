@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace S3ZipContent
 {
-    public class S3ZipContentHelper
+    public class S3ZipContentHelper: IS3ZipContentHelper
     {
         private readonly IAmazonS3 s3;
 
