@@ -28,11 +28,13 @@ namespace S3ZipContent
 
             var length = metadata.ContentLength;
 
+            var readLength = length > 5012 ? 5012 : length;
+
             GetObjectRequest request = new GetObjectRequest
             {
                 BucketName = Bucket,
                 Key = Key,
-                ByteRange = new ByteRange(length - 5012, length)
+                ByteRange = new ByteRange(length - readLength, length)
             };
 
             var zipEndingResponse = s3.GetObjectAsync(request);
