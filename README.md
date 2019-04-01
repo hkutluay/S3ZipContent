@@ -10,7 +10,7 @@ PM> Install-Package S3ZipContent
 ```
 
 Sample usage:
-```
+```csharp
 AmazonS3Client s3 = new AmazonS3Client();
 
 S3ZipContentHelper content = new S3ZipContentHelper(s3);
