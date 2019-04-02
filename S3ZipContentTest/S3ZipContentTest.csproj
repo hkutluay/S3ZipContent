@@ -18,11 +18,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ZipFiles\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="ZipFiles\foo.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ZipFiles\foo64.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
