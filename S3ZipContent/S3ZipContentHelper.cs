@@ -13,6 +13,7 @@ namespace S3ZipContent
     {
         private readonly IAmazonS3 s3;
 
+        //https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT
         static readonly byte[] eocdHeader = new byte[] { 80, 75, 5, 6 };
         static readonly byte[] zip64EocdHeader = new byte[] { 80, 75, 6, 6 };
         static readonly byte[] zip64EocdLocatorHeader = new byte[] { 80, 75, 6, 7 };
