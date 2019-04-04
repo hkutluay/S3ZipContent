@@ -5,8 +5,8 @@
     <Authors>Hakan Kutluay</Authors>
     <Description>Lists zip file content on AWS S3 without downloading whole document. Supports both zip and zip64 files.</Description>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <PackageTags>zip file content on aws s3</PackageTags>
-    <Version>1.0.1</Version>
+    <PackageTags>zipfile content list aws s3</PackageTags>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
