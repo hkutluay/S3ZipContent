@@ -89,7 +89,7 @@ namespace S3ZipContent
                 for (int i = 0; i < 8; i++)
                     zip64EocdHeaderBytes[i + 48] = 0;
 
-                byte[] offset = BitConverter.GetBytes(centralDirectoryData.LongLength);
+                byte[] offset = BitConverter.GetBytes(Convert.ToInt64(centralDirectoryData.Length));
 
                 for (int i = 0; i < 8; i++)
                     zip64EocdLocatorHeaderBytes[i + 8] = offset[i];
