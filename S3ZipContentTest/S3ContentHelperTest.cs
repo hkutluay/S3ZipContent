@@ -61,8 +61,7 @@ namespace S3ZipContentTest
                                var dataRange = br.ReadBytes(Convert.ToInt32(request.ByteRange.End - request.ByteRange.Start));
 
                                var ms = new MemoryStream(dataRange);
-
-
+                               
                                return new GetObjectResponse
                                {
                                    BucketName = request.BucketName,
