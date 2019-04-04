@@ -78,20 +78,20 @@ namespace S3ZipContentTest
         [TestMethod]
         public async Task LengthTest()
         {
-            var zipHelper = new S3ZipContentHelper(s3ClientMock.Object);
+            s3ZipContentHelper = new S3ZipContentHelper(s3ClientMock.Object);
 
-            var content = await zipHelper.GetContent("Test", "foo.zip");
+            var content = await s3ZipContentHelper.GetContent("Test", "foo.zip");
 
             Assert.AreEqual(content.Count, 1);
 
         }
 
         [TestMethod]
-        public async Task LengthTest64Bit()
+        public async Task LengthTest64BitWithComments()
         {
-            var zipHelper = new S3ZipContentHelper(s3ClientMock.Object);
+            s3ZipContentHelper = new S3ZipContentHelper(s3ClientMock.Object);
 
-            var content = await zipHelper.GetContent("Test", "foo64.zip");
+            var content = await s3ZipContentHelper.GetContent("Test", "foo64.zip");
 
             Assert.AreEqual(content.Count, 1);
 
@@ -101,22 +101,22 @@ namespace S3ZipContentTest
         [TestMethod]
         public async Task ContentTest()
         {
-            var zipHelper = new S3ZipContentHelper(s3ClientMock.Object);
+            s3ZipContentHelper = new S3ZipContentHelper(s3ClientMock.Object);
 
-            var content = await zipHelper.GetContent("Test", "foo.zip");
+            var content = await s3ZipContentHelper.GetContent("Test", "foo.zip");
 
             Assert.AreEqual(content[0].FullName, "foo.txt");
 
         }
 
         [TestMethod]
-        public async Task ContentTest64Bit()
+        public async Task ContentTest64BitWithComments()
         {
-            var zipHelper = new S3ZipContentHelper(s3ClientMock.Object);
+            s3ZipContentHelper = new S3ZipContentHelper(s3ClientMock.Object);
 
-            var content = await zipHelper.GetContent("Test", "foo64.zip");
+            var content = await s3ZipContentHelper.GetContent("Test", "foo64.zip");
 
-            Assert.AreEqual(content[0].FullName, "Documents");
+            Assert.AreEqual(content[0].FullName, "Documents/foo.txt");
 
         }
     }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace S3ZipContent
 {
-    public class S3ZipContentHelper: IS3ZipContentHelper
+    public class S3ZipContentHelper : IS3ZipContentHelper
     {
         private readonly IAmazonS3 s3;
 
@@ -46,13 +46,21 @@ namespace S3ZipContent
 
             long size = BitConverter.ToUInt32(eocdHeaderBytes.Skip(12).Take(4).ToArray(), 0);
             long start = BitConverter.ToUInt32(eocdHeaderBytes.Skip(16).Take(4).ToArray(), 0);
+            int commentLength = BitConverter.ToUInt16(eocdHeaderBytes.Skip(20).Take(2).ToArray(), 0);
+
+            if (commentLength > 0)
+            {
+                eocdHeaderBytes = endingBytes.Skip(pos).Take(22 + commentLength).ToArray();
+            }
 
             byte[] zip64EocdLocatorHeaderBytes = null, zip64EocdHeaderBytes = null;
 
-            if (start == UInt32.MaxValue) //zip64bit
+            int zip64EocdHeaderPos = Search(endingBytes, zip64EocdHeader);
+            int zip64EocdLocatorHeaderPos = Search(endingBytes, zip64EocdLocatorHeader);
+
+
+            if (zip64EocdHeaderPos != -1 && zip64EocdLocatorHeaderPos != -1) //zip64bit
             {
-                int zip64EocdHeaderPos = Search(endingBytes, zip64EocdHeader);
-                int zip64EocdLocatorHeaderPos = Search(endingBytes, zip64EocdLocatorHeader);
 
                 zip64EocdHeaderBytes = endingBytes.Skip(zip64EocdHeaderPos).Take(56).ToArray();
 
@@ -62,25 +70,37 @@ namespace S3ZipContent
                 zip64EocdLocatorHeaderBytes = endingBytes.Skip(zip64EocdLocatorHeaderPos).Take(20).ToArray();
             }
 
-            GetObjectRequest request2 = new GetObjectRequest
+            GetObjectRequest centralDirectoryRequest = new GetObjectRequest
             {
                 BucketName = Bucket,
                 Key = Key,
                 ByteRange = new ByteRange(start, start + size)
             };
 
-            var contentResponse = s3.GetObjectAsync(request2);
-            var contentBytes = StreamToArray(contentResponse.Result.ResponseStream);
+            var centralDirectoryResponse = s3.GetObjectAsync(centralDirectoryRequest);
+            var centralDirectoryData = StreamToArray(centralDirectoryResponse.Result.ResponseStream);
 
-            eocdHeaderBytes[16] = 0;
-            eocdHeaderBytes[17] = 0;
-            eocdHeaderBytes[18] = 0;
-            eocdHeaderBytes[19] = 0;
+            for (int i = 0; i < 4; i++)
+                eocdHeaderBytes[i + 16] = 0;
 
             if (zip64EocdLocatorHeaderBytes != null)
-                contentBytes = contentBytes.Concat(zip64EocdLocatorHeaderBytes).ToArray();
+            {
+                for (int i = 0; i < 8; i++)
+                    zip64EocdHeaderBytes[i + 48] = 0;
 
-            var newFile = contentBytes.Concat(eocdHeaderBytes).ToArray();
+                byte[] offset = BitConverter.GetBytes(centralDirectoryData.LongLength);
+
+                for (int i = 0; i < 8; i++)
+                    zip64EocdLocatorHeaderBytes[i + 8] = offset[i];
+            }
+
+            if (zip64EocdHeaderBytes != null)
+                centralDirectoryData = centralDirectoryData.Concat(zip64EocdHeaderBytes).ToArray();
+
+            if (zip64EocdLocatorHeaderBytes != null)
+                centralDirectoryData = centralDirectoryData.Concat(zip64EocdLocatorHeaderBytes).ToArray();
+                       
+            var newFile = centralDirectoryData.Concat(eocdHeaderBytes).ToArray();
 
             using (Stream stream = new MemoryStream(newFile))
             using (var archive = new ZipArchive(stream, ZipArchiveMode.Read))
