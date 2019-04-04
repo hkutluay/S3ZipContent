@@ -20,9 +20,7 @@ namespace S3ZipContentTest
 
         public S3ContentHelperTest()
         {
-            //  var docStream = new FileInfo("ZipFiles/foo.zip").OpenRead();
-            //   var br = new BinaryReader(docStream);
-
+           
             s3ClientMock = new Mock<IAmazonS3>();
 
             s3ClientMock.Setup(x => x.GetObjectMetadataAsync(
