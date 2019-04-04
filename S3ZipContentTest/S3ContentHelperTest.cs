@@ -119,5 +119,17 @@ namespace S3ZipContentTest
             Assert.AreEqual(content[0].FullName, "Documents/foo.txt");
 
         }
+
+        [TestMethod]
+        public async Task NestedZipTest()
+        {
+            s3ZipContentHelper = new S3ZipContentHelper(s3ClientMock.Object);
+
+            var content = await s3ZipContentHelper.GetContent("Test", "nested.zip");
+
+            Assert.AreEqual(content.Count, 1);
+
+        }
+
     }
 }
