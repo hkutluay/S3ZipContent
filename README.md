@@ -11,9 +11,9 @@ PM> Install-Package S3ZipContent
 
 Sample usage:
 ```csharp
-AmazonS3Client s3 = new AmazonS3Client();
+IAmazonS3 s3 = new AmazonS3Client();
 
-S3ZipContentHelper content = new S3ZipContentHelper(s3);
+IS3ZipContentHelper content = new S3ZipContentHelper(s3);
 var contentList = await content.GetContent("Bucket", "Key");
 
 foreach (var content in contentList)
