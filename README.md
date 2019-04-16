@@ -19,3 +19,9 @@ var contentList = await content.GetContent("Bucket", "Key");
 foreach (var content in contentList)
    Console.WriteLine(item.FullName);
  ```
+
+# Dependencies
+
+AWSSDK.S3 (>= 3.3.0)
+
+NETStandard.Library (>= 1.6.1)
