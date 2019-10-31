@@ -17,6 +17,7 @@ namespace S3ZipContent
         static readonly byte[] eocdHeader = new byte[] { 80, 75, 5, 6 };
         static readonly byte[] zip64EocdHeader = new byte[] { 80, 75, 6, 6 };
         static readonly byte[] zip64EocdLocatorHeader = new byte[] { 80, 75, 6, 7 };
+        static readonly byte[] localFileHeader = new byte[] { 80, 75, 3, 4 };
 
         public S3ZipContentHelper(IAmazonS3 S3)
         {
@@ -31,6 +32,22 @@ namespace S3ZipContent
 
             var readLength = length > 5012 ? 5012 : length;
 
+
+            //Check zip file:
+            GetObjectRequest headerRequest = new GetObjectRequest
+            {
+                BucketName = Bucket,
+                Key = Key,
+                ByteRange = new ByteRange(0,4)
+            };
+            var headerResponse = await s3.GetObjectAsync(headerRequest);
+            var headerBytes = StreamToArray(headerResponse.ResponseStream);
+            int headerPos = Search(headerBytes, localFileHeader);
+
+            if (headerPos == -1)
+                throw new FileIsNotaZipException();
+
+
             GetObjectRequest request = new GetObjectRequest
             {
                 BucketName = Bucket,
@@ -38,8 +55,8 @@ namespace S3ZipContent
                 ByteRange = new ByteRange(length - readLength, length)
             };
 
-            var zipEndingResponse = s3.GetObjectAsync(request);
-            var endingBytes = StreamToArray(zipEndingResponse.Result.ResponseStream);
+            var zipEndingResponse = await s3.GetObjectAsync(request);
+            var endingBytes = StreamToArray(zipEndingResponse.ResponseStream);
 
             int pos = Search(endingBytes, eocdHeader);
 
@@ -78,8 +95,8 @@ namespace S3ZipContent
                 ByteRange = new ByteRange(start, start + size)
             };
 
-            var centralDirectoryResponse = s3.GetObjectAsync(centralDirectoryRequest);
-            var centralDirectoryData = StreamToArray(centralDirectoryResponse.Result.ResponseStream);
+            var centralDirectoryResponse = await s3.GetObjectAsync(centralDirectoryRequest);
+            var centralDirectoryData = StreamToArray(centralDirectoryResponse.ResponseStream);
 
             for (int i = 0; i < 4; i++)
                 eocdHeaderBytes[i + 16] = 0;

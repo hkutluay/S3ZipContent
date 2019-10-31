@@ -96,7 +96,7 @@ namespace S3ZipContentTest
 
 
         [TestMethod]
-        public async Task ContentTest()
+        public async Task Content()
         {
             s3ZipContentHelper = new S3ZipContentHelper(s3ClientMock.Object);
 
@@ -118,7 +118,7 @@ namespace S3ZipContentTest
         }
 
         [TestMethod]
-        public async Task NestedZipTest()
+        public async Task NestedZip()
         {
             s3ZipContentHelper = new S3ZipContentHelper(s3ClientMock.Object);
 
@@ -128,5 +128,25 @@ namespace S3ZipContentTest
 
         }
 
+
+        [TestMethod]
+        [ExpectedException(typeof(FileIsNotaZipException))]
+        public async Task NotZipFileException()
+        {
+            s3ZipContentHelper = new S3ZipContentHelper(s3ClientMock.Object);
+
+            var content = await s3ZipContentHelper.GetContent("Test", "not-a-zip.zip");
+            
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FileIsNotaZipException))]
+        public async Task ZeroByte()
+        {
+            s3ZipContentHelper = new S3ZipContentHelper(s3ClientMock.Object);
+
+            var content = await s3ZipContentHelper.GetContent("Test", "zero-byte.zip");
+
+        }
     }
 }
