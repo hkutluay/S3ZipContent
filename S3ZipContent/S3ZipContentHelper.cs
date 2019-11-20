@@ -34,29 +34,14 @@ namespace S3ZipContent
 
 
             //Check zip file:
-            GetObjectRequest headerRequest = new GetObjectRequest
-            {
-                BucketName = Bucket,
-                Key = Key,
-                ByteRange = new ByteRange(0,4)
-            };
-            var headerResponse = await s3.GetObjectAsync(headerRequest);
-            var headerBytes = StreamToArray(headerResponse.ResponseStream);
+            var headerBytes = await GetRangeBytes(Bucket,Key, new ByteRange(0, 4));
             int headerPos = Search(headerBytes, localFileHeader);
 
             if (headerPos == -1)
                 throw new FileIsNotaZipException();
 
 
-            GetObjectRequest request = new GetObjectRequest
-            {
-                BucketName = Bucket,
-                Key = Key,
-                ByteRange = new ByteRange(length - readLength, length)
-            };
-
-            var zipEndingResponse = await s3.GetObjectAsync(request);
-            var endingBytes = StreamToArray(zipEndingResponse.ResponseStream);
+            var endingBytes = await GetRangeBytes(Bucket, Key, new ByteRange(length - readLength, length));
 
             int pos = Search(endingBytes, eocdHeader);
 
@@ -88,15 +73,7 @@ namespace S3ZipContent
                 zip64EocdLocatorHeaderBytes = endingBytes.Skip(zip64EocdLocatorHeaderPos).Take(20).ToArray();
             }
 
-            GetObjectRequest centralDirectoryRequest = new GetObjectRequest
-            {
-                BucketName = Bucket,
-                Key = Key,
-                ByteRange = new ByteRange(start, start + size)
-            };
-
-            var centralDirectoryResponse = await s3.GetObjectAsync(centralDirectoryRequest);
-            var centralDirectoryData = StreamToArray(centralDirectoryResponse.ResponseStream);
+            var centralDirectoryData = await GetRangeBytes(Bucket, Key, new ByteRange(start, start + size));
 
             for (int i = 0; i < 4; i++)
                 eocdHeaderBytes[i + 16] = 0;
@@ -123,6 +100,18 @@ namespace S3ZipContent
             using (Stream stream = new MemoryStream(newFile))
             using (var archive = new ZipArchive(stream, ZipArchiveMode.Read))
                 return archive.Entries.ToList();
+        }
+
+        private async Task<byte[]> GetRangeBytes(string Bucket, string Key, ByteRange Range)
+        {
+            GetObjectRequest request = new GetObjectRequest
+            {
+                BucketName = Bucket,
+                Key = Key,
+                ByteRange = Range
+            };
+            var response = await s3.GetObjectAsync(request);
+            return StreamToArray(response.ResponseStream);
         }
 
         private byte[] StreamToArray(Stream input)
