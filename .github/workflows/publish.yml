@@ -1,0 +1,23 @@
+name: publish to nuget
+on:
+  release:
+     types: [published]
+jobs:
+  build:
+ 
+    runs-on: windows-latest
+     
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.101
+    - name: Build with dotnet
+      run: dotnet build --configuration Release
+    - name: Test with dotnet
+      run: dotnet test
+    - name: Pack with dotnet
+      run: dotnet pack S3ZipContent/S3ZipContent.csproj --configuration Release
+    - name: Push with dotnet
+      run: dotnet nuget push **/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --no-symbols --source https://api.nuget.org/v3/index.json
