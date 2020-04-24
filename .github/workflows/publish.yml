@@ -20,4 +20,4 @@ jobs:
     - name: Pack with dotnet
       run: dotnet pack S3ZipContent/S3ZipContent.csproj --configuration Release
     - name: Push with dotnet
-      run: dotnet nuget push **/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --no-symbols --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push **/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json  --no-symbols 1
