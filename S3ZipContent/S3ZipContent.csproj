@@ -8,7 +8,11 @@
     <PackageTags>zipfile content list aws s3</PackageTags>
     <Version>1.1.0</Version>
   </PropertyGroup>
-
+  <!-- Conditionally obtain references for the .NET Framework 4.0 target -->
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <Reference Include="System.IO.Compression" />
+    <Reference Include=" System.IO.Compression.FileSystem" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="3.3.0" />
   </ItemGroup>
