@@ -22,6 +22,19 @@ foreach (var content in contentList)
 
 # Dependencies
 
+**.NETFramework 4.5**
+
+AWSSDK.S3 (>= 3.3.0)
+
+**.NETStandard 1.6**
+
 AWSSDK.S3 (>= 3.3.0)
 
 NETStandard.Library (>= 1.6.1)
+
+**.NETStandard 2.0**
+
+AWSSDK.S3 (>= 3.3.0)
+
+**.NETStandard 2.1**
+AWSSDK.S3 (>= 3.3.0)
