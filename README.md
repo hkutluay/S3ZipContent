@@ -1,3 +1,5 @@
+![build & test](https://github.com/hkutluay/S3ZipContent/workflows/build%20&%20test/badge.svg)
+
 # S3ZipContent
 Lists zip file content on AWS S3 without downloading whole document. Supports both zip and zip64 files.
 
