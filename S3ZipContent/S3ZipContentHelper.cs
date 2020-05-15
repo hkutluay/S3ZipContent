@@ -24,7 +24,7 @@ namespace S3ZipContent
             s3 = S3;
         }
 
-        public async Task<IList<ZipArchiveEntry>> GetContent(string Bucket, string Key)
+        public async Task<IList<ZipEntry>> GetContent(string Bucket, string Key)
         {
             var metadata = await s3.GetObjectMetadataAsync(Bucket, Key);
 
@@ -34,7 +34,7 @@ namespace S3ZipContent
 
 
             //Check zip file:
-            var headerBytes = await GetRangeBytes(Bucket,Key, new ByteRange(0, 4));
+            var headerBytes = await GetRangeBytes(Bucket, Key, new ByteRange(0, 4));
             int headerPos = Search(headerBytes, localFileHeader);
 
             if (headerPos == -1)
@@ -51,10 +51,8 @@ namespace S3ZipContent
             long start = BitConverter.ToUInt32(eocdHeaderBytes.Skip(16).Take(4).ToArray(), 0);
             int commentLength = BitConverter.ToUInt16(eocdHeaderBytes.Skip(20).Take(2).ToArray(), 0);
 
-            if (commentLength > 0)
-            {
-                eocdHeaderBytes = endingBytes.Skip(pos).Take(22 + commentLength).ToArray();
-            }
+            eocdHeaderBytes = endingBytes.Skip(pos).Take(22 + (commentLength > 0 ? commentLength : 0)).ToArray();
+
 
             byte[] zip64EocdLocatorHeaderBytes = null, zip64EocdHeaderBytes = null;
 
@@ -94,12 +92,12 @@ namespace S3ZipContent
 
             if (zip64EocdLocatorHeaderBytes != null)
                 centralDirectoryData = centralDirectoryData.Concat(zip64EocdLocatorHeaderBytes).ToArray();
-                       
+
             var newFile = centralDirectoryData.Concat(eocdHeaderBytes).ToArray();
 
             using (Stream stream = new MemoryStream(newFile))
             using (var archive = new ZipArchive(stream, ZipArchiveMode.Read))
-                return archive.Entries.ToList();
+                return archive.Entries.Select(x => new ZipEntry() { FullName = x.FullName, LastWriteTime = x.LastWriteTime, Name = x.Name }).ToList();
         }
 
         private async Task<byte[]> GetRangeBytes(string Bucket, string Key, ByteRange Range)
@@ -128,7 +126,7 @@ namespace S3ZipContent
             int c = src.Length - pattern.Length + 1;
             int j;
 
-            for (int i = c; i > -1 ; i--)
+            for (int i = c; i > -1; i--)
             {
                 if (src[i] != pattern[0]) continue;
                 for (j = pattern.Length - 1; j >= 1 && src[i + j] == pattern[j]; j--) ;
