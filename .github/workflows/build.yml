@@ -1,4 +1,4 @@
-name: build & run tests multi
+name: build & test
 
 on: [push]
 
