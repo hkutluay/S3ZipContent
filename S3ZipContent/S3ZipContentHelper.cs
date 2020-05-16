@@ -11,7 +11,7 @@ namespace S3ZipContent
 {
     public class S3ZipContentHelper : IS3ZipContentHelper
     {
-        private readonly IAmazonS3 s3;
+        private readonly IAmazonS3 _s3;
 
         //https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT
         static readonly byte[] eocdHeader = new byte[] { 80, 75, 5, 6 };
@@ -19,14 +19,14 @@ namespace S3ZipContent
         static readonly byte[] zip64EocdLocatorHeader = new byte[] { 80, 75, 6, 7 };
         static readonly byte[] localFileHeader = new byte[] { 80, 75, 3, 4 };
 
-        public S3ZipContentHelper(IAmazonS3 S3)
+        public S3ZipContentHelper(IAmazonS3 s3)
         {
-            s3 = S3;
+            _s3 = s3;
         }
 
         public async Task<IList<ZipEntry>> GetContent(string bucket, string key)
         {
-            var metadata = await s3.GetObjectMetadataAsync(bucket, key);
+            var metadata = await _s3.GetObjectMetadataAsync(bucket, key);
 
             var length = metadata.ContentLength;
 
@@ -108,7 +108,7 @@ namespace S3ZipContent
                 Key = key,
                 ByteRange = range
             };
-            var response = await s3.GetObjectAsync(request);
+            var response = await _s3.GetObjectAsync(request);
             return StreamToArray(response.ResponseStream);
         }
 
