@@ -1,71 +1,15 @@
 using Amazon.S3;
 using Amazon.S3.Model;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using Moq;
-using S3ZipContent;
+
 using System;
 using System.IO;
 using System.Net;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace S3ZipContentTest
 {
-    [TestClass]
-    public class S3ContentHelperTest
-    {
-        [TestMethod]
-        public async Task LengthTest()
-        {
-            var sut = new S3ZipContentHelper(TestContext.GetAmazonS3Client());
-
-            var content = await sut.GetContents("Test", "foo.zip");
-
-            Assert.AreEqual(content.Count, 1);
-        }
-
-        [TestMethod]
-        public async Task LengthTest64BitWithComments()
-        {
-            var sut = new S3ZipContentHelper(TestContext.GetAmazonS3Client());
-
-            var content = await sut.GetContents("Test", "foo64.zip");
-
-            Assert.AreEqual(content.Count, 1);
-        }
-
-
-        [TestMethod]
-        public async Task Content()
-        {
-            var sut = new S3ZipContentHelper(TestContext.GetAmazonS3Client());
-
-            var content = await sut.GetContents("Test", "foo.zip");
-
-            Assert.AreEqual(content[0].FullName, "foo.txt");
-        }
-
-        [TestMethod]
-        public async Task ContentTest64BitWithComments()
-        {
-            var sut = new S3ZipContentHelper(TestContext.GetAmazonS3Client());
-
-            var content = await sut.GetContents("Test", "foo64.zip");
-
-            Assert.AreEqual(content[0].FullName, "Documents/foo.txt");
-        }
-
-        [TestMethod]
-        public async Task NestedZip()
-        {
-            var sut = new S3ZipContentHelper(TestContext.GetAmazonS3Client());
-
-            var content = await sut.GetContents("Test", "nested.zip");
-
-            Assert.AreEqual(content.Count, 1);
-        }
-    }
-
     public static class TestContext
     {
         public static IAmazonS3 GetAmazonS3Client()
