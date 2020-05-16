@@ -1,3 +1,5 @@
+![logo](https://user-images.githubusercontent.com/1468775/82124931-1ffb8300-97ab-11ea-9d73-37672cdbe0cd.png)
+
 ![build & test](https://github.com/hkutluay/S3ZipContent/workflows/build%20&%20test/badge.svg)
 
 # S3ZipContent
