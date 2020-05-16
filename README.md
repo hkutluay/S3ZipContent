@@ -17,7 +17,7 @@ Sample usage:
 IAmazonS3 s3 = new AmazonS3Client();
 
 IS3ZipContentHelper content = new S3ZipContentHelper(s3);
-var contentList = await content.GetContent("Bucket", "Key");
+var contentList = await content.GetContents("Bucket", "Key");
 
 foreach (var content in contentList)
    Console.WriteLine(item.FullName);
