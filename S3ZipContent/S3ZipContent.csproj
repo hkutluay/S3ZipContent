@@ -8,6 +8,10 @@
     <PackageTags>zipfile content list aws s3</PackageTags>
     <Version>1.1.1</Version>
     <AssemblyVersion>1.1.1.0</AssemblyVersion>
+    <PackageIcon>logo.png</PackageIcon>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/hkutluay/S3ZipContent</RepositoryUrl>
+    <RepositoryType>Github</RepositoryType>
   </PropertyGroup>
   <!-- Conditionally obtain references for the .NET Framework 4.0 target -->
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
@@ -16,6 +20,12 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="3.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="logo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
