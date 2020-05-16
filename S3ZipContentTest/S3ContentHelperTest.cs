@@ -14,14 +14,70 @@ namespace S3ZipContentTest
     [TestClass]
     public class S3ContentHelperTest
     {
-
-        private Mock<IAmazonS3> s3ClientMock;
         private IS3ZipContentHelper s3ZipContentHelper;
-
-        public S3ContentHelperTest()
+        
+        [TestMethod]
+        public async Task LengthTest()
         {
-           
-            s3ClientMock = new Mock<IAmazonS3>();
+            s3ZipContentHelper = new S3ZipContentHelper(TestContext.GetAmazonS3Client());
+
+            var content = await s3ZipContentHelper.GetContents("Test", "foo.zip");
+
+            Assert.AreEqual(content.Count, 1);
+
+        }
+
+        [TestMethod]
+        public async Task LengthTest64BitWithComments()
+        {
+            s3ZipContentHelper = new S3ZipContentHelper(TestContext.GetAmazonS3Client());
+
+            var content = await s3ZipContentHelper.GetContents("Test", "foo64.zip");
+
+            Assert.AreEqual(content.Count, 1);
+
+        }
+
+
+        [TestMethod]
+        public async Task Content()
+        {
+            s3ZipContentHelper = new S3ZipContentHelper(TestContext.GetAmazonS3Client());
+
+            var content = await s3ZipContentHelper.GetContents("Test", "foo.zip");
+
+            Assert.AreEqual(content[0].FullName, "foo.txt");
+
+        }
+
+        [TestMethod]
+        public async Task ContentTest64BitWithComments()
+        {
+            s3ZipContentHelper = new S3ZipContentHelper(TestContext.GetAmazonS3Client());
+
+            var content = await s3ZipContentHelper.GetContents("Test", "foo64.zip");
+
+            Assert.AreEqual(content[0].FullName, "Documents/foo.txt");
+
+        }
+
+        [TestMethod]
+        public async Task NestedZip()
+        {
+            s3ZipContentHelper = new S3ZipContentHelper(TestContext.GetAmazonS3Client());
+
+            var content = await s3ZipContentHelper.GetContents("Test", "nested.zip");
+
+            Assert.AreEqual(content.Count, 1);
+
+        }
+    }
+
+    public static class TestContext
+    {
+        public static IAmazonS3 GetAmazonS3Client()
+        {
+            var s3ClientMock = new Mock<IAmazonS3>();
 
             s3ClientMock.Setup(x => x.GetObjectMetadataAsync(
                              It.IsAny<string>(),
@@ -59,7 +115,7 @@ namespace S3ZipContentTest
                                var dataRange = br.ReadBytes(Convert.ToInt32(request.ByteRange.End - request.ByteRange.Start));
 
                                var ms = new MemoryStream(dataRange);
-                               
+
                                return new GetObjectResponse
                                {
                                    BucketName = request.BucketName,
@@ -68,94 +124,7 @@ namespace S3ZipContentTest
                                    ResponseStream = ms
                                };
                            });
-
-
-        }
-
-        [TestMethod]
-        public async Task LengthTest()
-        {
-            s3ZipContentHelper = new S3ZipContentHelper(s3ClientMock.Object);
-
-            var content = await s3ZipContentHelper.GetContents("Test", "foo.zip");
-
-            Assert.AreEqual(content.Count, 1);
-
-        }
-
-        [TestMethod]
-        public async Task LengthTest64BitWithComments()
-        {
-            s3ZipContentHelper = new S3ZipContentHelper(s3ClientMock.Object);
-
-            var content = await s3ZipContentHelper.GetContents("Test", "foo64.zip");
-
-            Assert.AreEqual(content.Count, 1);
-
-        }
-
-
-        [TestMethod]
-        public async Task Content()
-        {
-            s3ZipContentHelper = new S3ZipContentHelper(s3ClientMock.Object);
-
-            var content = await s3ZipContentHelper.GetContents("Test", "foo.zip");
-
-            Assert.AreEqual(content[0].FullName, "foo.txt");
-
-        }
-
-        [TestMethod]
-        public async Task ContentTest64BitWithComments()
-        {
-            s3ZipContentHelper = new S3ZipContentHelper(s3ClientMock.Object);
-
-            var content = await s3ZipContentHelper.GetContents("Test", "foo64.zip");
-
-            Assert.AreEqual(content[0].FullName, "Documents/foo.txt");
-
-        }
-
-        [TestMethod]
-        public async Task NestedZip()
-        {
-            s3ZipContentHelper = new S3ZipContentHelper(s3ClientMock.Object);
-
-            var content = await s3ZipContentHelper.GetContents("Test", "nested.zip");
-
-            Assert.AreEqual(content.Count, 1);
-
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(FileIsNotaZipException))]
-        public async Task ZeroFileZip()
-        {
-            s3ZipContentHelper = new S3ZipContentHelper(s3ClientMock.Object);
-
-            await s3ZipContentHelper.GetContents("Test", "zero-file.zip");
-        }
-
-
-        [TestMethod]
-        [ExpectedException(typeof(FileIsNotaZipException))]
-        public async Task NotZipFileException()
-        {
-            s3ZipContentHelper = new S3ZipContentHelper(s3ClientMock.Object);
-
-            await s3ZipContentHelper.GetContents("Test", "not-a-zip.zip");
-            
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(FileIsNotaZipException))]
-        public async Task ZeroByte()
-        {
-            s3ZipContentHelper = new S3ZipContentHelper(s3ClientMock.Object);
-
-            await s3ZipContentHelper.GetContents("Test", "zero-byte.zip");
-
+            return s3ClientMock.Object;
         }
     }
 }
