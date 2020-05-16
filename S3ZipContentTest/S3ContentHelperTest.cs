@@ -77,7 +77,7 @@ namespace S3ZipContentTest
         {
             s3ZipContentHelper = new S3ZipContentHelper(s3ClientMock.Object);
 
-            var content = await s3ZipContentHelper.GetContent("Test", "foo.zip");
+            var content = await s3ZipContentHelper.GetContents("Test", "foo.zip");
 
             Assert.AreEqual(content.Count, 1);
 
@@ -88,7 +88,7 @@ namespace S3ZipContentTest
         {
             s3ZipContentHelper = new S3ZipContentHelper(s3ClientMock.Object);
 
-            var content = await s3ZipContentHelper.GetContent("Test", "foo64.zip");
+            var content = await s3ZipContentHelper.GetContents("Test", "foo64.zip");
 
             Assert.AreEqual(content.Count, 1);
 
@@ -100,7 +100,7 @@ namespace S3ZipContentTest
         {
             s3ZipContentHelper = new S3ZipContentHelper(s3ClientMock.Object);
 
-            var content = await s3ZipContentHelper.GetContent("Test", "foo.zip");
+            var content = await s3ZipContentHelper.GetContents("Test", "foo.zip");
 
             Assert.AreEqual(content[0].FullName, "foo.txt");
 
@@ -111,7 +111,7 @@ namespace S3ZipContentTest
         {
             s3ZipContentHelper = new S3ZipContentHelper(s3ClientMock.Object);
 
-            var content = await s3ZipContentHelper.GetContent("Test", "foo64.zip");
+            var content = await s3ZipContentHelper.GetContents("Test", "foo64.zip");
 
             Assert.AreEqual(content[0].FullName, "Documents/foo.txt");
 
@@ -122,7 +122,7 @@ namespace S3ZipContentTest
         {
             s3ZipContentHelper = new S3ZipContentHelper(s3ClientMock.Object);
 
-            var content = await s3ZipContentHelper.GetContent("Test", "nested.zip");
+            var content = await s3ZipContentHelper.GetContents("Test", "nested.zip");
 
             Assert.AreEqual(content.Count, 1);
 
@@ -134,7 +134,7 @@ namespace S3ZipContentTest
         {
             s3ZipContentHelper = new S3ZipContentHelper(s3ClientMock.Object);
 
-            await s3ZipContentHelper.GetContent("Test", "zero-file.zip");
+            await s3ZipContentHelper.GetContents("Test", "zero-file.zip");
         }
 
 
@@ -144,7 +144,7 @@ namespace S3ZipContentTest
         {
             s3ZipContentHelper = new S3ZipContentHelper(s3ClientMock.Object);
 
-            await s3ZipContentHelper.GetContent("Test", "not-a-zip.zip");
+            await s3ZipContentHelper.GetContents("Test", "not-a-zip.zip");
             
         }
 
@@ -154,7 +154,7 @@ namespace S3ZipContentTest
         {
             s3ZipContentHelper = new S3ZipContentHelper(s3ClientMock.Object);
 
-            await s3ZipContentHelper.GetContent("Test", "zero-byte.zip");
+            await s3ZipContentHelper.GetContents("Test", "zero-byte.zip");
 
         }
     }

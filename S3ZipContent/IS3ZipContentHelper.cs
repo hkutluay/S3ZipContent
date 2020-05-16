@@ -6,6 +6,6 @@ namespace S3ZipContent
 {
     public interface IS3ZipContentHelper
     {
-        Task<IList<ZipEntry>> GetContent(string bucket, string key);
+        Task<IList<ZipEntry>> GetContents(string bucket, string key);
     }
 }

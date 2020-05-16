@@ -24,7 +24,7 @@ namespace S3ZipContent
             _s3 = s3;
         }
 
-        public async Task<IList<ZipEntry>> GetContent(string bucket, string key)
+        public async Task<IList<ZipEntry>> GetContents(string bucket, string key)
         {
             var metadata = await _s3.GetObjectMetadataAsync(bucket, key);
 
