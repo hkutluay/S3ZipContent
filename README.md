@@ -25,6 +25,10 @@ foreach (var content in contentList)
 
 # Dependencies
 
+**.net5.0**
+
+AWSSDK.S3 (>= 3.3.0)
+
 **.NETFramework 4.5**
 
 AWSSDK.S3 (>= 3.3.0)
