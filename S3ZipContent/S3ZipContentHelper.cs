@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace S3ZipContent
@@ -24,9 +25,9 @@ namespace S3ZipContent
             _s3 = s3;
         }
 
-        public async Task<IList<ZipEntry>> GetContents(string bucket, string key)
+        public async Task<IList<ZipEntry>> GetContents(string bucket, string key, CancellationToken cancellationToken = default)
         {
-            var metadata = await _s3.GetObjectMetadataAsync(bucket, key);
+            var metadata = await _s3.GetObjectMetadataAsync(bucket, key, cancellationToken);
 
             var length = metadata.ContentLength;
 
@@ -41,7 +42,7 @@ namespace S3ZipContent
                 throw new FileIsNotaZipException();
 
 
-            var endingBytes = await GetRangeBytes(bucket, key, new ByteRange(length - readLength, length));
+            var endingBytes = await GetRangeBytes(bucket, key, new ByteRange(length - readLength, length), cancellationToken);
 
             int pos = Search(endingBytes, eocdHeader);
 
@@ -71,7 +72,7 @@ namespace S3ZipContent
                 zip64EocdLocatorHeaderBytes = endingBytes.Skip(zip64EocdLocatorHeaderPos).Take(20).ToArray();
             }
 
-            var centralDirectoryData = await GetRangeBytes(bucket, key, new ByteRange(start, start + size));
+            var centralDirectoryData = await GetRangeBytes(bucket, key, new ByteRange(start, start + size), cancellationToken);
 
             for (int i = 0; i < 4; i++)
                 eocdHeaderBytes[i + 16] = 0;
@@ -100,7 +101,7 @@ namespace S3ZipContent
                 return archive.Entries.Select(x => new ZipEntry() { FullName = x.FullName, LastWriteTime = x.LastWriteTime, Name = x.Name }).ToList();
         }
 
-        private async Task<byte[]> GetRangeBytes(string bucket, string key, ByteRange range)
+        private async Task<byte[]> GetRangeBytes(string bucket, string key, ByteRange range, CancellationToken cancellationToken = default)
         {
             GetObjectRequest request = new GetObjectRequest
             {
@@ -108,7 +109,7 @@ namespace S3ZipContent
                 Key = key,
                 ByteRange = range
             };
-            var response = await _s3.GetObjectAsync(request);
+            var response = await _s3.GetObjectAsync(request, cancellationToken);
             return StreamToArray(response.ResponseStream);
         }
 
